@@ -1,0 +1,17 @@
+# Python / Backend
+fraud-backend/__pycache__/
+fraud-backend/*.pyc
+fraud-backend/*.pkl
+fraud-backend/.env
+fraud-backend/*.log
+fraud-backend/creditcard.csv
+
+# Node / Frontend
+fraud-frontend/node_modules/
+fraud-frontend/.next/
+fraud-frontend/out/
+fraud-frontend/.env.local
+
+# macOS / VS Code
+.DS_Store
+.vscode/
