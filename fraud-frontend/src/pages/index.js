@@ -21,7 +21,9 @@ export default function Home() {
     setResult(null);
 
     try {
-      const res = await fetch('http://host.docker.internal:5000/predict', {
+      // Use environment variable for backend URL, fallback to AWS EC2 for production
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://127.0.0.1:5000';
+      const res = await fetch(`${backendUrl}/predict`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

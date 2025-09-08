@@ -5,7 +5,11 @@ import pandas as pd
 
 # Initialize app
 app = Flask(__name__)
-CORS(app)
+# Configure CORS to allow your Vercel domain
+CORS(app, origins=[
+    "https://creditcardfraud-git-main-ovee-manolkars-projects.vercel.app",
+    "http://localhost:3000"  # For local development
+])
 
 # Load model and pipeline
 model = joblib.load("fraud_model.pkl")
