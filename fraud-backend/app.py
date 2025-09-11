@@ -5,13 +5,13 @@ import pandas as pd
 
 # Initialize app
 app = Flask(__name__)
-# Configure CORS to allow your Vercel domain and local frontend
+# Configure CORS to allow your Vercel domain
 CORS(app, origins=[
     "https://creditcardfraud-git-main-ovee-manolkars-projects.vercel.app",
-    "http://localhost:3000"  # For local development
+    "http://localhost:3000"  # For local dev
 ])
 
-# Load pipeline (includes preprocessing + model)
+# Load pipeline (includes model)
 pipeline = joblib.load("business_pipeline.pkl")
 
 # Define expected fields
@@ -25,8 +25,8 @@ def home():
 def predict():
     try:
         data = request.get_json()
-        
-        # Check if all fields are present
+
+        # Check for missing fields
         if not all(field in data for field in expected_fields):
             return jsonify({"error": f"Missing one of the required fields: {expected_fields}"}), 400
 
@@ -38,7 +38,7 @@ def predict():
             "MerchantType": data["MerchantType"]
         }])
 
-        # Predict directly using pipeline
+        # Predict directly with pipeline
         prediction = pipeline.predict(input_df)[0]
         result = "Fraud" if prediction == -1 else "Normal"
 
