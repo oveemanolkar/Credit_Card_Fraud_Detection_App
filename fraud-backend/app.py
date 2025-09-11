@@ -5,14 +5,13 @@ import pandas as pd
 
 # Initialize app
 app = Flask(__name__)
-# Configure CORS to allow your Vercel domain
+# Configure CORS to allow your Vercel domain and local frontend
 CORS(app, origins=[
     "https://creditcardfraud-git-main-ovee-manolkars-projects.vercel.app",
     "http://localhost:3000"  # For local development
 ])
 
-# Load model and pipeline
-model = joblib.load("fraud_model.pkl")
+# Load pipeline (includes preprocessing + model)
 pipeline = joblib.load("business_pipeline.pkl")
 
 # Define expected fields
@@ -39,9 +38,8 @@ def predict():
             "MerchantType": data["MerchantType"]
         }])
 
-        # Transform and predict
-        transformed = pipeline.transform(input_df)
-        prediction = model.predict(transformed)[0]
+        # Predict directly using pipeline
+        prediction = pipeline.predict(input_df)[0]
         result = "Fraud" if prediction == -1 else "Normal"
 
         return jsonify({"prediction": result})
