@@ -5,14 +5,14 @@ import pandas as pd
 
 # Initialize app
 app = Flask(__name__)
-# Configure CORS to allow your Vercel domain
 CORS(app, origins=[
     "https://creditcardfraud-git-main-ovee-manolkars-projects.vercel.app",
-    "http://localhost:3000"  # For local dev
+    "http://localhost:3000"
 ])
 
-# Load pipeline (includes model)
-pipeline = joblib.load("business_pipeline.pkl")
+# Load preprocessing pipeline and model separately
+pipeline = joblib.load("business_pipeline.pkl")   # ColumnTransformer
+model = joblib.load("fraud_model.pkl")            # Classifier
 
 # Define expected fields
 expected_fields = ["Amount", "Country", "TimeOfDay", "MerchantType"]
@@ -26,7 +26,7 @@ def predict():
     try:
         data = request.get_json()
 
-        # Check for missing fields
+        # Check if all fields are present
         if not all(field in data for field in expected_fields):
             return jsonify({"error": f"Missing one of the required fields: {expected_fields}"}), 400
 
@@ -38,8 +38,9 @@ def predict():
             "MerchantType": data["MerchantType"]
         }])
 
-        # Predict directly with pipeline
-        prediction = pipeline.predict(input_df)[0]
+        # First transform input with pipeline, then predict with model
+        transformed = pipeline.transform(input_df)
+        prediction = model.predict(transformed)[0]
         result = "Fraud" if prediction == -1 else "Normal"
 
         return jsonify({"prediction": result})
