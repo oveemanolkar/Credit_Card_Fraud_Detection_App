@@ -1,10 +1,13 @@
 # Python / Backend
 fraud-backend/__pycache__/
 fraud-backend/*.pyc
-fraud-backend/*.pkl
 fraud-backend/.env
 fraud-backend/*.log
 fraud-backend/creditcard.csv
+
+# Ignore all pickle files except the pipeline
+fraud-backend/*.pkl
+!fraud-backend/business_pipeline.pkl
 
 # Node / Frontend
 fraud-frontend/node_modules/

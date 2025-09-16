@@ -1,51 +1,34 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS
 import joblib
 import pandas as pd
 
-# Initialize app
 app = Flask(__name__)
-# Configure CORS to allow your Vercel domain
-CORS(app, origins=[
-    "https://creditcardfraud-git-main-ovee-manolkars-projects.vercel.app",
-    "http://localhost:3000"  # For local development
-])
 
-# Load pipeline (classifier included inside)
+# Load the trained pipeline
 pipeline = joblib.load("business_pipeline.pkl")
 
-# Define expected fields
-expected_fields = ["Amount", "Country", "TimeOfDay", "MerchantType"]
-
-@app.route("/")
+@app.route('/')
 def home():
-    return "✅ Credit Card Fraud Detection API is running"
+    return "✅ Credit Card Fraud Detection API is running!"
 
-@app.route("/predict", methods=["POST"])
+@app.route('/predict', methods=['POST'])
 def predict():
     try:
         data = request.get_json()
-        
-        # Check if all fields are present
-        if not all(field in data for field in expected_fields):
-            return jsonify({"error": f"Missing one of the required fields: {expected_fields}"}), 400
 
-        # Create DataFrame from input
-        input_df = pd.DataFrame([{
-            "Amount": float(data["Amount"]),
-            "Country": data["Country"],
-            "TimeOfDay": data["TimeOfDay"],
-            "MerchantType": data["MerchantType"]
-        }])
+        # Expecting JSON like:
+        # {"Amount": 250, "Country": "US", "TimeOfDay": "afternoon", "MerchantType": "online"}
+        input_df = pd.DataFrame([data])
 
-        # Predict directly from pipeline
         prediction = pipeline.predict(input_df)[0]
-        result = "Fraud" if prediction == -1 else "Normal"
 
-        return jsonify({"prediction": result})
+        return jsonify({
+            "prediction": int(prediction),
+            "message": "Fraud" if prediction == 1 else "Not Fraud"
+        })
 
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": str(e)}), 400
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5000, debug=True)
