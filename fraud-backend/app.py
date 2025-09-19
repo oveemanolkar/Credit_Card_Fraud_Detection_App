@@ -1,10 +1,10 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS   # ✅ Import CORS
+from flask_cors import CORS   # ✅ Add this
 import joblib
 import pandas as pd
 
 app = Flask(__name__)
-CORS(app)  # ✅ Enable CORS for all routes
+CORS(app)  # ✅ Allow all origins (later you can restrict to Vercel domain)
 
 # Load the trained pipeline
 pipeline = joblib.load("business_pipeline.pkl")
@@ -17,18 +17,12 @@ def home():
 def predict():
     try:
         data = request.get_json()
-
-        # Expecting JSON like:
-        # {"Amount": 250, "Country": "US", "TimeOfDay": "afternoon", "MerchantType": "online"}
         input_df = pd.DataFrame([data])
-
         prediction = pipeline.predict(input_df)[0]
-
         return jsonify({
             "prediction": int(prediction),
             "message": "Fraud" if prediction == 1 else "Not Fraud"
         })
-
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
