@@ -1,10 +1,19 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS   # ✅ Add this
+from flask_cors import CORS
 import joblib
 import pandas as pd
 
 app = Flask(__name__)
-CORS(app)  # ✅ Allow all origins (later you can restrict to Vercel domain)
+
+# ✅ Restrict CORS to your deployed Vercel frontend domain
+CORS(app, resources={
+    r"/predict": {"origins": [
+        "https://credit-card-fraud-detection-app-alpha.vercel.app"
+    ]},
+    r"/": {"origins": [
+        "https://credit-card-fraud-detection-app-alpha.vercel.app"
+    ]}
+})
 
 # Load the trained pipeline
 pipeline = joblib.load("business_pipeline.pkl")
