@@ -21,9 +21,8 @@ export default function Home() {
     setResult(null);
 
     try {
-      // Use environment variable for backend URL, fallback to local
-      const backendUrl =
-        process.env.NEXT_PUBLIC_BACKEND_URL || 'http://127.0.0.1:5000';
+      // ✅ Use ONLY env variable, no localhost fallback
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
       console.log('Calling backend at:', backendUrl);
 
       const res = await fetch(`${backendUrl}/predict`, {
@@ -32,8 +31,8 @@ export default function Home() {
         body: JSON.stringify({
           Amount: parseFloat(form.Amount),
           Country: form.Country,
-          TimeOfDay: form.TimeOfDay,
-          MerchantType: form.MerchantType,
+          TimeOfDay: form.TimeOfDay.toLowerCase(),
+          MerchantType: form.MerchantType.toLowerCase(),
         }),
       });
 
@@ -45,6 +44,7 @@ export default function Home() {
         setResult(data.message); // "Fraud" or "Not Fraud"
       }
     } catch (error) {
+      console.error('Fetch error:', error);
       setResult('Error connecting to backend.');
     }
 
