@@ -21,8 +21,11 @@ export default function Home() {
     setResult(null);
 
     try {
-      // Use environment variable for backend URL, fallback to AWS EC2 for production
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://127.0.0.1:5000';
+      // Use environment variable for backend URL, fallback to local
+      const backendUrl =
+        process.env.NEXT_PUBLIC_BACKEND_URL || 'http://127.0.0.1:5000';
+      console.log('Calling backend at:', backendUrl);
+
       const res = await fetch(`${backendUrl}/predict`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -35,9 +38,14 @@ export default function Home() {
       });
 
       const data = await res.json();
-      setResult(data.prediction || data.error);
+
+      if (data.error) {
+        setResult(`Error: ${data.error}`);
+      } else {
+        setResult(data.message); // "Fraud" or "Not Fraud"
+      }
     } catch (error) {
-      setResult("Error connecting to backend.");
+      setResult('Error connecting to backend.');
     }
 
     setLoading(false);
