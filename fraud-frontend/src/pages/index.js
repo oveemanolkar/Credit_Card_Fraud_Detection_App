@@ -21,18 +21,15 @@ export default function Home() {
     setResult(null);
 
     try {
-      // ✅ Use ONLY env variable, no localhost fallback
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
-      console.log('Calling backend at:', backendUrl);
-
-      const res = await fetch(`${backendUrl}/predict`, {
+      // ✅ Always call /api/predict (Netlify will proxy to EC2 backend)
+      const res = await fetch(`/api/predict`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           Amount: parseFloat(form.Amount),
           Country: form.Country,
-          TimeOfDay: form.TimeOfDay.toLowerCase(),
-          MerchantType: form.MerchantType.toLowerCase(),
+          TimeOfDay: form.TimeOfDay,
+          MerchantType: form.MerchantType,
         }),
       });
 
@@ -44,7 +41,6 @@ export default function Home() {
         setResult(data.message); // "Fraud" or "Not Fraud"
       }
     } catch (error) {
-      console.error('Fetch error:', error);
       setResult('Error connecting to backend.');
     }
 
