@@ -21,8 +21,14 @@ export default function Home() {
     setResult(null);
 
     try {
-      // ✅ Always call /api/predict (Netlify will proxy to EC2 backend)
-      const res = await fetch(`/api/predict`, {
+      // ✅ For local dev → use NEXT_PUBLIC_BACKEND_URL from .env.local
+      // ✅ For Netlify → just call /api/predict (netlify.toml will proxy)
+      const backendUrl =
+        process.env.NEXT_PUBLIC_BACKEND_URL || '/api';
+
+      console.log('Calling backend at:', backendUrl);
+
+      const res = await fetch(`${backendUrl}/predict`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -41,6 +47,7 @@ export default function Home() {
         setResult(data.message); // "Fraud" or "Not Fraud"
       }
     } catch (error) {
+      console.error('Frontend error:', error);
       setResult('Error connecting to backend.');
     }
 
